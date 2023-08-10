@@ -15,12 +15,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			]
 		},
+
 		actions: {
 			// Use getActions to call a function within a fuction
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
-
+			getToken: () => {
+				let myToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MTYzNDIyMCwianRpIjoiYWVlNDhlMzktZGU4OC00ZWUxLWE1NDEtNjE1MGJjODFhYWY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6InRlc3QiLCJuYmYiOjE2OTE2MzQyMjAsImV4cCI6MTY5MTYzNTEyMH0.qrU9eLKDTUsA4Y8We5vW_cgZClHWl2TSrAKdX0kqyjE"
+				
+			}
 			getMessage: async () => {
 				try{
 					// fetching data from the backend
