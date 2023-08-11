@@ -60,6 +60,8 @@ def login():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
-# @api.route("/home", methods=["POST"])
-# @jwt_required()
-# def home():
+@api.route("/private", methods=["POST"])
+@jwt_required()
+def private():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
