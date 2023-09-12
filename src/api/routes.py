@@ -21,7 +21,6 @@ api = Blueprint('api', __name__)
 # Flask Bcrypt
 bcrypt = Bcrypt(app)
 
-
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
 
@@ -31,13 +30,12 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-
-@api.route('/register', methods=['POST'])
+@api.route('/singup', methods=['POST'])
 def create_user():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     # encrypt password:
-    pw_hash = bcrypt.generate_password_hash(password)
+    pw_hash = bcrypt.generate_password_hash(password).decode('utf-8')
     # create new user
     new_user = User(email=email, password=pw_hash)
     db.session.add(new_user)
@@ -47,14 +45,13 @@ def create_user():
 
 @api.route("/login", methods=["POST"])
 def login():
-    password_from_database = 'contraseña'
-    # Hash pasword, only for test, in the data base the password is encrypt:
-    db_pw_hash = bcrypt.generate_password_hash(password_from_database)
-
     email = request.json.get("email", None)
     password = request.json.get("password", None)
 
-    if email != "test" and bcrypt.check_password_hash(db_pw_hash, password):
+    email_from_database = User.query.filter_by(email=email).first()
+    password_from_database = User.query.filter_by(password=password).first()
+
+    if email != email_from_database and bcrypt.check_password_hash(password_from_database, password):
         return jsonify({"msg": "Bad email or password"}), 401
 
     access_token = create_access_token(identity=email)

@@ -1,55 +1,46 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			
 		},
 
 		actions: {
 			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			getMessage: async () => {
-				try{
-					let myToken = localStorage.getItem("token");
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/private")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
+			singup: async (form) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/singup", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(form),
+					})
+					if (response.status != 200) alert("Ups, there was an error, please try another email")
+					const data = await response.json()
+					alert("Success singup")
+					return true;
+				}
+				catch (error) {
+					alert("Error loading message from backend")
 				}
 			},
 			login: async (form) => {
 				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/login", {
-						method : "POST",
-						body : form
+						method: "POST",
+						body: JSON.stringify(form)
 					})
 					const data = await response.json()
 					localStorage.setItem("userToken", data.access_token)
+					console.log("login success")
 				}
-				catch(error){
+				catch (error) {
 					console.log("Error loading message from backend", error)
 				}
 			},
-			requestToken: async(form) => {
+			requestToken: async (form) => {
 				let userToken = localStorage.getItem("userToken");
-				try{
+				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/private", {
 						method: "GET",
 						headers: {
@@ -61,25 +52,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const data = await response.json()
 					console.log(data)
 				}
-				catch(error){
+				catch (error) {
 					console.log("Error loading message from backend", error)
 				}
 			},
-			
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
 		}
 	};
 };
