@@ -1,7 +1,7 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			
+			token: null
 		},
 
 		actions: {
@@ -28,33 +28,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/login", {
 						method: "POST",
+						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify(form)
 					})
-					const data = await response.json()
-					localStorage.setItem("userToken", data.access_token)
-					console.log("login success")
+					if (response.status === 401) alert("Bad user or password");
+					else if (response.status !== 200) {
+						return false;
+					}
+					const data = await response.json();
+					localStorage.setItem("userToken", data.access_token);
+					setStore({ token: data.access_token });
+					alert("Success login");
+					return true;
 				}
 				catch (error) {
-					console.log("Error loading message from backend", error)
+					alert("Error loading message from backend");
 				}
 			},
-			requestToken: async (form) => {
-				let userToken = localStorage.getItem("userToken");
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/private", {
-						method: "GET",
-						headers: {
-							"Authorization": userToken,
-							"Content-Type": "application/json",
-						},
-						body: form
-					})
-					const data = await response.json()
-					console.log(data)
-				}
-				catch (error) {
-					console.log("Error loading message from backend", error)
-				}
+			tokenFomLocalStorage: () => {
+				const token = localStorage.getItem("userToken");
+				if (token && token != "" && token != undefined) setStore({ token: token });
+			},
+			logout: () => {
+				localStorage.removeItem("userToken");
+				setStore({ token: null });
 			},
 		}
 	};

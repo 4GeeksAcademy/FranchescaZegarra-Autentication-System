@@ -1,25 +1,35 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Home = () => {
-	const { actions } = useContext(Context);
+	const { store, actions } = useContext(Context);
 
 	const [form, setForm] = useState({
 		email:"",
 		password:"",
 	})
-
+	
+	const navigate = useNavigate();
 	function inputValue(e){
 		setForm({...form, [e.target.name]: e.target.value})
 	};
 
+	const login = async(form) => {
+		const resp = await actions.login(form);
+		if (resp == true){
+			navigate('/private');
+		}
+	}
 	function sendLogin(e) {
 		e.preventDefault();
-		actions.login(form);
+		login(form);
 	};
-	console.log(form)
+
+	if (store.token && store.token !== "" && store.token !== undefined) navigate("/private");
+	console.log(store.token)
+	
 	return (
 		<>
 			<div className="container">

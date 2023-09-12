@@ -48,13 +48,15 @@ def login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
 
-    email_from_database = User.query.filter_by(email=email).first()
-    password_from_database = User.query.filter_by(password=password).first()
+    user_from_database = User.query.filter_by(email=email).first()
+    if not user_from_database :
+        return jsonify("Email doesn't found"), 400
+    else :    
+        password_from_database = user_from_database.password
+        if not bcrypt.check_password_hash(password_from_database, password):
+            return jsonify("Password is wrong"), 401
 
-    if email != email_from_database and bcrypt.check_password_hash(password_from_database, password):
-        return jsonify({"msg": "Bad email or password"}), 401
-
-    access_token = create_access_token(identity=email)
+    access_token = create_access_token(identity=user_from_database.id)
     return jsonify(access_token=access_token)
 
 @api.route("/private", methods=["POST"])
